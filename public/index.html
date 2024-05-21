@@ -1,0 +1,89 @@
+<html>
+
+<head>
+  <title>Corn Prices</title>
+  <link rel="stylesheet" href="/stylesheets/style.css">
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table, th, td {
+      border: 1px solid black;
+    }
+    th, td {
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+
+<body>
+<h1>Corn Prices</h1>
+<label for="date">Enter Date (YYYY-MM):</label>
+<input type="text" id="date" name="date">
+<button id="searchBtn">Search</button>
+
+<h2>Results</h2>
+<div id="results"></div>
+
+<h2>All Prices</h2>
+<table id="allPricesTable">
+  <thead>
+  <tr>
+    <th>Date</th>
+    <th>Price</th>
+  </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script>
+  document.getElementById('searchBtn').addEventListener('click', () => {
+    const date = document.getElementById('date').value;
+    fetch('/api/quotes')
+            .then(response => response.json())
+            .then(data => {
+              const resultsDiv = document.getElementById('results');
+              resultsDiv.innerHTML = ''; // 清空之前的結果
+              const filteredData = data.filter(item => item.year_month === date);
+              if (filteredData.length > 0) {
+                filteredData.forEach(item => {
+                  const p = document.createElement('p');
+                  p.textContent = `Date: ${item.year_month}, Price: ${item.price}`;
+                  resultsDiv.appendChild(p);
+                });
+              } else {
+                resultsDiv.textContent = 'No results found.';
+              }
+            })
+            .catch(error => console.error('Error:', error));
+  });
+
+  // Fetch and display all prices in the table
+  fetch('/api/quotes')
+          .then(response => response.json())
+          .then(data => {
+            const tableBody = document.querySelector('#allPricesTable tbody');
+            tableBody.innerHTML = ''; // 清空之前的數據
+            data.forEach(item => {
+              const row = document.createElement('tr');
+              const dateCell = document.createElement('td');
+              const priceCell = document.createElement('td');
+
+              dateCell.textContent = item.year_month;
+              priceCell.textContent = item.price;
+
+              row.appendChild(dateCell);
+              row.appendChild(priceCell);
+              tableBody.appendChild(row);
+            });
+          })
+          .catch(error => console.error('Error:', error));
+</script>
+</body>
+
+</html>
