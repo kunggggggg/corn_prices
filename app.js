@@ -5,6 +5,7 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var aboutRouter = require('./routes/about');
 
 var app = express();
 
@@ -16,6 +17,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/about', aboutRouter);
 
 //在 express.js 中，使用 sqlite3 來操作數據庫，並開啟位置在 db/sqlite.db 的資歷庫，需要確認是否成功打開資料庫
 const sqlite3 = require('sqlite3').verbose();

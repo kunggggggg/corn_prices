@@ -4,6 +4,12 @@
   <title>Corn Prices</title>
   <link rel="stylesheet" href="/stylesheets/style.css">
   <style>
+    h1, label, input, button {
+      font-size: 16px; /* 修改字體大小為 24 像素 */
+    }
+    #results p {
+      font-size: 18px;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
@@ -18,14 +24,53 @@
     th {
       background-color: #f2f2f2;
     }
+
+    h1 {
+      text-align: center;
+      background-color: #f38619;
+      color: white;
+      padding: 40px;
+      font-size: 36px;
+      z-index: 1; /* 確保文字在圖片之上 */
+
+    }
+    .show-hide-btn {
+      width: 115px; /* 按鈕寬度 */
+      height: 25px; /* 按鈕高度 */
+      font-size: 14px; /* 字體大小 */
+
+    }
+    nav ul {
+      margin-left: auto; /* 將導航欄推到右邊 */
+    }
+
+    nav ul li {
+      display: inline-block;
+      margin-right: 40px; /* 鏈接之間的右邊距 */
+      margin-left: -30px; /* 向左調整位置 */
+    }
+
+
+
+
+
   </style>
 </head>
 
 <body>
+
+<nav>
+  <ul>
+    <li><a href="/about">About Corn</a></li>
+    <li><a href="/">Corn Prices</a></li>
+  </ul>
+</nav>
+
 <h1>Corn Prices</h1>
-<label for="date">Enter Date (YYYY-MM):</label>
-<input type="text" id="date" name="date">
-<button id="searchBtn">Search</button>
+  <label for="date">Enter Date (YYYY-MM):</label>
+  <input type="text" id="date" name="date">
+  <button id="searchBtn">Search</button>
+
 
 <h2>Results</h2>
 <div id="results"></div>
@@ -41,7 +86,41 @@
   <tbody></tbody>
 </table>
 
+<button id="showFullTableBtn" class="show-hide-btn">Show Full Table</button>
+
 <script>
+  let isPartialTable = true;
+  const allPricesTable = document.getElementById('allPricesTable');
+  const showFullTableBtn = document.getElementById('showFullTableBtn');
+
+  showFullTableBtn.addEventListener('click', () => {
+    isPartialTable = !isPartialTable;
+    if (isPartialTable) {
+      showPartialTable();
+    } else {
+      showFullTable();
+    }
+  });
+
+  // 设置表格初始显示行数为4
+  const initialRowCount = 4;
+
+  function showPartialTable() {
+    allPricesTable.querySelectorAll('tr').forEach((row, index) => {
+      if (index >= initialRowCount) {
+        row.style.display = 'none'; // 隐藏超出部分的行
+      }
+    });
+    showFullTableBtn.textContent = 'Show Full Table';
+  }
+
+  function showFullTable() {
+    allPricesTable.querySelectorAll('tr').forEach(row => {
+      row.style.display = ''; // 显示所有行
+    });
+    showFullTableBtn.textContent = 'Hide Full Table';
+  }
+
   document.getElementById('searchBtn').addEventListener('click', () => {
     const date = document.getElementById('date').value;
     fetch('/api/quotes')
@@ -68,7 +147,7 @@
           .then(response => response.json())
           .then(data => {
             const tableBody = document.querySelector('#allPricesTable tbody');
-            tableBody.innerHTML = ''; // 清空之前的數據
+            tableBody.innerHTML = ''; // 清空之前的数据
             data.forEach(item => {
               const row = document.createElement('tr');
               const dateCell = document.createElement('td');
@@ -81,6 +160,9 @@
               row.appendChild(priceCell);
               tableBody.appendChild(row);
             });
+
+            // 一开始只显示部分表格
+            showPartialTable();
           })
           .catch(error => console.error('Error:', error));
 </script>
